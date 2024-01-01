@@ -6,6 +6,7 @@ import Lean
 namespace Polynomial
   /-
     Polynomials are lists of rationals (the coefficients, in increasing power order)
+    TODO: we are defining a polynomial type because the one in Mathlib cannot be computed with directly. In particular, we need to be able to evaluate roots and such. However, we should probably be using the one in mathlib in stating isolated_root (then we can drop eval_at_real) and then proceed via reflection. For this we need to prove equivalence of definitions though, see https://leanprover.zulipchat.com/#narrow/stream/113488-general/topic/Way.20to.20recover.20computability.3F.
   -/
 
   def poly : Type := List ℚ
