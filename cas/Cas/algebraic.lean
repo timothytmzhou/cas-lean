@@ -1,5 +1,6 @@
 import Mathlib
 import Mathlib.Data.Vector
+
 import Lean
 
 namespace Polynomial
@@ -10,11 +11,38 @@ namespace Polynomial
   def poly : Type := List ℚ
     deriving Repr, ToString
 
+  def eval_at_rat (p : poly) (r : ℚ) : ℚ :=
+    let rec sum_terms i p := match p with
+    | [] => 0
+    | x::xs => x * r^i + sum_terms (i+1) xs
+    sum_terms 0 p
+
   def eval_at_real (p : poly) (r : ℝ) : ℝ :=
     let rec sum_terms i p := match p with
     | [] => 0
     | x::xs => x * r^i + sum_terms (i+1) xs
     sum_terms 0 p
+
+  lemma rat_root_to_real {p : poly} {r : ℚ} : (eval_at_rat p r) = 0 → (eval_at_real p r = 0) := by
+    have h2: (∀ i : ℕ, eval_at_real.sum_terms r i p = eval_at_rat.sum_terms r i p ) := by
+      induction p with
+      | nil =>
+        unfold eval_at_rat.sum_terms
+        unfold eval_at_real.sum_terms
+        simp
+      | cons _ _ ih =>
+        intro i
+        unfold eval_at_rat.sum_terms
+        unfold eval_at_real.sum_terms
+        simp
+        apply (ih (i + 1))
+    intro h1
+    have h3 : eval_at_real p r = eval_at_rat p r := by
+      unfold eval_at_rat
+      unfold eval_at_real
+      apply (h2 0)
+    have h4 : eval_at_rat p r = (0 : ℝ) := by simp; apply h1
+    exact (Eq.trans h3 h4)
 
 end Polynomial
 
@@ -61,6 +89,6 @@ namespace Algebraic
   structure algebraic where
     root_of : poly
     i : interval
-    wd : isolated_root p i
+    wd : isolated_root root_of i
 
 end Algebraic
